@@ -1,14 +1,14 @@
 package errors
 
 type Error struct {
-	code int
-	err  error
+	Code int
+	Err  error
 }
 
 func newError(code int, err error) *Error {
 	return &Error{
-		code: code,
-		err:  err,
+		Code: code,
+		Err:  err,
 	}
 }
 

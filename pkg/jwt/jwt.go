@@ -30,7 +30,8 @@ type IJWTService interface {
 }
 
 type JWTService struct {
-	secretKey string
+	SecretKey string
+	Issuer    string
 }
 
 func (s *JWTService) GenerateToken(userId int) (string, *errors.Error) {
@@ -40,11 +41,12 @@ func (s *JWTService) GenerateToken(userId int) (string, *errors.Error) {
 			jwt.MapClaims{
 				"userId": userId,
 				"exp":    time.Now().Add(time.Hour * 24).Unix(),
+				"iss":    s.Issuer,
 			},
 		},
 	)
 
-	tokenStr, err := token.SignedString(s.secretKey)
+	tokenStr, err := token.SignedString(s.SecretKey)
 	if err != nil {
 		return "", errors.InternalServerError(err)
 	}

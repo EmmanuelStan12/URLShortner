@@ -1,15 +1,19 @@
-package app
+package context
 
 import (
 	"github.com/EmmanuelStan12/URLShortner/internal/config"
 	"github.com/EmmanuelStan12/URLShortner/internal/database"
+	"github.com/EmmanuelStan12/URLShortner/internal/util"
+	"github.com/EmmanuelStan12/URLShortner/pkg/jwt"
 	"gorm.io/gorm"
 )
 
 // Context These are the app dependencies, majorly the singletons
 type Context struct {
-	Config *config.Config
-	DB     *gorm.DB
+	Config     *config.Config
+	DB         *gorm.DB
+	JWTService jwt.JWTService
+	Routes     util.Routes
 }
 
 func InitContext() (*Context, error) {
@@ -18,10 +22,17 @@ func InitContext() (*Context, error) {
 		return nil, err
 	}
 
+	s := jwt.JWTService{
+		SecretKey: c.Security.JWT.SecretKey,
+		Issuer:    c.Security.JWT.Issuer,
+	}
+
 	db, err := database.InitDatabase(c.DB)
 	context := &Context{
-		Config: c,
-		DB:     db,
+		Config:     c,
+		DB:         db,
+		JWTService: s,
+		Routes:     util.InitRoutes(),
 	}
 
 	return context, nil
