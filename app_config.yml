@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+db:
+  host: localhost
+  username: user
+  password: password
+
+security:
+  jwt:
+    secret_key: secret_key
+    issuer: issue
