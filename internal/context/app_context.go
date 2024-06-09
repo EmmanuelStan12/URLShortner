@@ -3,6 +3,7 @@ package context
 import (
 	"github.com/EmmanuelStan12/URLShortner/internal/config"
 	"github.com/EmmanuelStan12/URLShortner/internal/database"
+	"github.com/EmmanuelStan12/URLShortner/internal/services"
 	"github.com/EmmanuelStan12/URLShortner/internal/util"
 	"github.com/EmmanuelStan12/URLShortner/pkg/jwt"
 	"gorm.io/gorm"
@@ -14,6 +15,10 @@ type Context struct {
 	DB         *gorm.DB
 	JWTService jwt.JWTService
 	Routes     util.Routes
+}
+
+func (c Context) GetUserService() services.IUserService {
+	return services.UserService{DB: c.DB}
 }
 
 func InitContext() (*Context, error) {

@@ -2,10 +2,10 @@ package errors
 
 type Error struct {
 	Code int
-	Err  error
+	Err  any
 }
 
-func newError(code int, err error) *Error {
+func newError(code int, err any) *Error {
 	return &Error{
 		Code: code,
 		Err:  err,
@@ -26,4 +26,8 @@ func BadRequestError(err error) *Error {
 
 func UnauthorizedError(err error) *Error {
 	return newError(401, err)
+}
+
+func ValidationError(errors []string) *Error {
+	return newError(400, errors)
 }

@@ -34,7 +34,7 @@ type JWTService struct {
 	Issuer    string
 }
 
-func (s *JWTService) GenerateToken(userId int) (string, *errors.Error) {
+func (s *JWTService) GenerateToken(userId uint) (string, *errors.Error) {
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		CustomClaims{
@@ -55,7 +55,7 @@ func (s *JWTService) GenerateToken(userId int) (string, *errors.Error) {
 
 func (s *JWTService) ParseToken(tokenStr string) (int, *errors.Error) {
 	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
-		return s.secretKey, nil
+		return s.SecretKey, nil
 	})
 
 	if err != nil {
