@@ -9,13 +9,14 @@ import (
 	apperrors "github.com/EmmanuelStan12/URLShortner/pkg/errors"
 	"github.com/EmmanuelStan12/URLShortner/pkg/jwt"
 	"net/http"
+	"strings"
 )
 
 func JWTMiddleware(service jwt.JWTService, routes util.Routes, userService services.IUserService) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
-			path := r.URL.Path
-			if routes.IsPublic(path) {
+			path := strings.Split(r.URL.Path, "/")
+			if routes.IsPublic(path[len(path)-1]) {
 				next.ServeHTTP(w, r)
 				return
 			}

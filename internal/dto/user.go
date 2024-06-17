@@ -3,25 +3,25 @@ package dto
 import "time"
 
 type RegisterUserRequest struct {
-	Name     string
-	Email    string
-	Password string
+	Name     string `name:"json"`
+	Email    string `email:"json"`
+	Password string `password:"json"`
 }
 
 type LoginUserRequest struct {
-	Email    string
-	Password string
+	Email    string `email:"json"`
+	Password string `password:"json"`
 }
 
 type UpdateUserRequest struct {
 	RegisterUserRequest
-	OldPassword string
+	OldPassword string `oldPassword:"json"`
 }
 
 type UserDTO struct {
-	Name      string
-	Email     string
-	ID        uint
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Name      string    `name:"json"`
+	Email     string    `email:"json"`
+	ID        uint      `id:"json"`
+	CreatedAt time.Time `createdAt:"json"`
+	UpdatedAt time.Time `updatedAt:"json"`
 }

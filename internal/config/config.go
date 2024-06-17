@@ -16,7 +16,7 @@ type Config struct {
 
 func InitRootConfig() (*Config, error) {
 	env := os.Getenv(util.ENVIRONMENT)
-	path := fmt.Sprintf("../../app_config_%s.yml", env)
+	path := fmt.Sprintf("app_config_%s.yml", env)
 	absPath, err := filepath.Abs(path)
 	if err != nil {
 		return nil, err

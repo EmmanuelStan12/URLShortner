@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/EmmanuelStan12/URLShortner/internal/config"
+	"github.com/EmmanuelStan12/URLShortner/internal/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -16,6 +17,10 @@ func InitDatabase(dbConfig config.DBConfig) (*gorm.DB, error) {
 		&gorm.Config{},
 	)
 
+	if err != nil {
+		return nil, err
+	}
+	err = db.AutoMigrate(&models.User{})
 	if err != nil {
 		return nil, err
 	}
