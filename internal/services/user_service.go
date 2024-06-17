@@ -10,10 +10,10 @@ import (
 )
 
 type IUserService interface {
-	GetById(int) dto.UserDTO
-	Update(int, *dto.UpdateUserRequest) dto.UserDTO
+	GetById(uint) dto.UserDTO
+	Update(uint, *dto.UpdateUserRequest) dto.UserDTO
 	Create(request *dto.RegisterUserRequest) dto.UserDTO
-	Delete(int) dto.UserDTO
+	Delete(uint) dto.UserDTO
 	Login(request dto.LoginUserRequest) dto.UserDTO
 }
 
@@ -23,11 +23,15 @@ type UserService struct {
 
 func (u UserService) Login(request dto.LoginUserRequest) dto.UserDTO {
 	var user models.User
+	errs := make([]string, 0)
 	if request.Password == "" {
-		panic(apperrors.BadRequestError(errors.New("password cannot be empty")))
+		errs = append(errs, "password cannot be empty")
 	}
 	if request.Email == "" {
-		panic(apperrors.BadRequestError(errors.New("email cannot be empty")))
+		errs = append(errs, "email cannot be empty")
+	}
+	if len(errs) > 0 {
+		panic(apperrors.ValidationError(errs))
 	}
 	password, _ := util.HashPassword(request.Password)
 	result := u.DB.Where("email = ? AND password = ?", request.Email, password).Find(&user)
@@ -37,14 +41,14 @@ func (u UserService) Login(request dto.LoginUserRequest) dto.UserDTO {
 	return util.ToUserDTO(user)
 }
 
-func (u UserService) GetById(userId int) dto.UserDTO {
+func (u UserService) GetById(userId uint) dto.UserDTO {
 	user := u.getById(userId)
 	return util.ToUserDTO(*user)
 }
 
-func (u UserService) Update(userId int, request *dto.UpdateUserRequest) dto.UserDTO {
+func (u UserService) Update(userId uint, request *dto.UpdateUserRequest) dto.UserDTO {
 	user := u.getById(userId)
-	errs := make([]string, 5)
+	errs := make([]string, 0)
 	if request.Name != "" {
 		user.Name = request.Name
 	}
@@ -84,7 +88,7 @@ func (u UserService) Update(userId int, request *dto.UpdateUserRequest) dto.User
 
 func (u UserService) Create(request *dto.RegisterUserRequest) dto.UserDTO {
 	user := models.User{}
-	errs := make([]string, 5)
+	errs := make([]string, 0)
 	if request.Name == "" {
 		errs = append(errs, "name cannot be empty")
 	}
@@ -122,13 +126,13 @@ func (u UserService) Create(request *dto.RegisterUserRequest) dto.UserDTO {
 	return util.ToUserDTO(user)
 }
 
-func (u UserService) Delete(userId int) dto.UserDTO {
+func (u UserService) Delete(userId uint) dto.UserDTO {
 	user := u.getById(userId)
 	u.DB.Unscoped().Delete(models.User{}, userId)
 	return util.ToUserDTO(*user)
 }
 
-func (u UserService) getById(userId int) *models.User {
+func (u UserService) getById(userId uint) *models.User {
 	user := models.User{}
 	res := u.DB.First(&user, userId)
 	if res.Error != nil {

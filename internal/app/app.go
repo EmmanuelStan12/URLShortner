@@ -19,7 +19,7 @@ func Run() {
 	r.Use(middleware.Logger)
 	r.Use(appmiddleware.ErrorMiddleware())
 	r.Use(appmiddleware.ContextMiddleware(*ctx))
-	r.Use(appmiddleware.JWTMiddleware(ctx.JWTService, ctx.Routes, ctx.DB))
+	r.Use(appmiddleware.JWTMiddleware(ctx.JWTService, ctx.Routes, ctx.GetUserService()))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))

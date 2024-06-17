@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/EmmanuelStan12/URLShortner/internal/dto"
 	"github.com/EmmanuelStan12/URLShortner/pkg/errors"
 	"net/http"
@@ -18,7 +19,7 @@ func ErrorMiddleware() func(next http.Handler) http.Handler {
 					switch e := err.(type) {
 					case *errors.Error:
 						status = e.Code
-						message = e.Err.Error()
+						message = fmt.Sprintf("%s", e.Err)
 					case error:
 						status = http.StatusInternalServerError
 						message = e.Error()

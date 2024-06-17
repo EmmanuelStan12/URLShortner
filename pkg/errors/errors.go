@@ -21,7 +21,7 @@ func InternalServerError(err error) *Error {
 }
 
 func BadRequestError(err error) *Error {
-	return newError(404, err)
+	return newError(400, err)
 }
 
 func UnauthorizedError(err error) *Error {

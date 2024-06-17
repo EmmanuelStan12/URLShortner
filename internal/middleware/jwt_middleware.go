@@ -27,7 +27,7 @@ func JWTMiddleware(service jwt.JWTService, routes util.Routes, userService servi
 			token = token[len("Bearer "):]
 			userId, err := service.ParseToken(token)
 			if err != nil {
-				panic(err)
+				panic(apperrors.UnauthorizedError(errors.New("invalid token")))
 			}
 			user := userService.GetById(userId)
 			routeCtx := context.WithValue(r.Context(), constants.UserKey, user)

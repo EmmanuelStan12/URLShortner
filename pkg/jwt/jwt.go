@@ -8,16 +8,19 @@ import (
 	"time"
 )
 
-type CustomClaims struct {
-	jwt.MapClaims
-}
-
-func (c CustomClaims) GetUserId() (int, *errors.Error) {
-	v, ok := c.MapClaims["userId"]
+func getUserId(c jwt.MapClaims) (uint, *errors.Error) {
+	v, ok := c["userId"]
 	if ok {
-		userId, ok := v.(int)
-		if ok {
+		switch v := v.(type) {
+		case float64:
+			userId := uint(v)
 			return userId, nil
+		case int:
+			return uint(v), nil
+		case uint:
+			return v, nil
+		default:
+			return 0, errors.UnauthorizedError(fmt.Errorf("%d is invalid for key userId", v))
 		}
 	}
 
@@ -37,25 +40,23 @@ type JWTService struct {
 func (s *JWTService) GenerateToken(userId uint) (string, *errors.Error) {
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
-		CustomClaims{
-			jwt.MapClaims{
-				"userId": userId,
-				"exp":    time.Now().Add(time.Hour * 24).Unix(),
-				"iss":    s.Issuer,
-			},
+		jwt.MapClaims{
+			"userId": userId,
+			"exp":    time.Now().Add(time.Hour * 24).Unix(),
+			"iss":    s.Issuer,
 		},
 	)
 
-	tokenStr, err := token.SignedString(s.SecretKey)
+	tokenStr, err := token.SignedString([]byte(s.SecretKey))
 	if err != nil {
 		return "", errors.InternalServerError(err)
 	}
 	return tokenStr, nil
 }
 
-func (s *JWTService) ParseToken(tokenStr string) (int, *errors.Error) {
+func (s *JWTService) ParseToken(tokenStr string) (uint, *errors.Error) {
 	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
-		return s.SecretKey, nil
+		return []byte(s.SecretKey), nil
 	})
 
 	if err != nil {
@@ -66,12 +67,12 @@ func (s *JWTService) ParseToken(tokenStr string) (int, *errors.Error) {
 		return 0, errors.UnauthorizedError(fmt.Errorf("invalid Token %s", tokenStr))
 	}
 
-	claims, ok := token.Claims.(CustomClaims)
+	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if !ok {
 		return 0, errors.InternalServerError(builtInErrors.New("can't pass claims"))
 	}
-	userId, e := claims.GetUserId()
+	userId, e := getUserId(claims)
 	if err != nil {
 		return 0, e
 	}

@@ -33,6 +33,9 @@ func InitContext() (*Context, error) {
 	}
 
 	db, err := database.InitDatabase(c.DB)
+	if err != nil {
+		return nil, err
+	}
 	context := &Context{
 		Config:     c,
 		DB:         db,

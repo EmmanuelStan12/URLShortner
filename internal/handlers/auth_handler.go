@@ -34,5 +34,25 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context().Value(constants.AppContextKey).(context.Context)
+	userService := ctx.GetUserService()
+	request := dto.RegisterUserRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		panic(apperrors.BadRequestError(err))
+	}
+	user := userService.Create(&request)
 
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	token, err := ctx.JWTService.GenerateToken(user.ID)
+	if err != nil {
+		panic(err)
+	}
+	json.NewEncoder(w).Encode(dto.SuccessResponse[any]{
+		Status: http.StatusOK,
+		Data: struct {
+			User  dto.UserDTO `user:"json"`
+			Token string      `token:"json"`
+		}{User: user, Token: token},
+	})
 }
