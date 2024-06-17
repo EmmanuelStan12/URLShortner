@@ -1,6 +1,8 @@
 package config
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestInitConfig(t *testing.T) {
 	t.Run("Valid file", func(t *testing.T) {

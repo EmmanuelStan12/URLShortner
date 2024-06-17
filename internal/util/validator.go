@@ -2,7 +2,7 @@ package util
 
 import (
 	"net/mail"
-	"regexp"
+	"unicode"
 )
 
 func IsEmailValid(email string) bool {
@@ -11,11 +11,23 @@ func IsEmailValid(email string) bool {
 }
 
 func IsPasswordValid(password string) bool {
-	regex := `^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#~$%^&*(),.?":{}|<>])[A-Za-z\d!@#~$%^&*(),.?":{}|<>]{8,}$`
-
-	re := regexp.MustCompile(regex)
-	if !re.MatchString(password) {
-		return false
+	lower := false
+	number := false
+	upper := false
+	special := false
+	for _, c := range password {
+		switch {
+		case unicode.IsNumber(c):
+			number = true
+		case unicode.IsUpper(c):
+			upper = true
+		case unicode.IsPunct(c) || unicode.IsSymbol(c):
+			special = true
+		case unicode.IsLetter(c) && c != ' ':
+			lower = true
+		default:
+			return false
+		}
 	}
-	return true
+	return number && special && upper && lower && len(password) > 7
 }

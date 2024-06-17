@@ -3,9 +3,9 @@ server:
 
 db:
   host: localhost
-  username: url_shortner
-  password: url_shortner
-  db_name: url_shortner_db
+  username: test
+  password: test123
+  db_name: url_shortner_db_test
   port: 3306
 
 security:

@@ -38,6 +38,9 @@ func (u UserService) Login(request dto.LoginUserRequest) dto.UserDTO {
 	if result.Error != nil {
 		panic(result.Error)
 	}
+	if user.Email == "" {
+		panic(apperrors.NotFoundError(errors.New("email and/or password is incorrect")))
+	}
 	return util.ToUserDTO(user)
 }
 
@@ -55,7 +58,7 @@ func (u UserService) Update(userId uint, request *dto.UpdateUserRequest) dto.Use
 	if request.Email != "" {
 		if !util.IsEmailValid(request.Email) {
 			errs = append(errs, "invalid email")
-		} else if u.checkIfEmailExists(request.Email) {
+		} else if u.emailExists(request.Email) {
 			errs = append(errs, "email already exists")
 		} else {
 			user.Email = request.Email
@@ -95,7 +98,7 @@ func (u UserService) Create(request *dto.RegisterUserRequest) dto.UserDTO {
 	if request.Email != "" {
 		if !util.IsEmailValid(request.Email) {
 			errs = append(errs, "invalid email")
-		} else if u.checkIfEmailExists(request.Email) {
+		} else if u.emailExists(request.Email) {
 			errs = append(errs, "email already exists")
 		}
 	} else {
@@ -137,7 +140,7 @@ func (u UserService) getById(userId uint) *models.User {
 	res := u.DB.First(&user, userId)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			panic(errors.New("user not found"))
+			panic(apperrors.NotFoundError(errors.New("user not found")))
 		}
 		panic(res.Error)
 	}
@@ -145,10 +148,10 @@ func (u UserService) getById(userId uint) *models.User {
 	return &user
 }
 
-func (u UserService) checkIfEmailExists(email string) bool {
+func (u UserService) emailExists(email string) bool {
 	var user models.User
 	result := u.DB.Where("email = ?", email).First(&user)
-	if result.Error != nil {
+	if result.Error != nil || user.Email == "" {
 		return false
 	}
 	return true

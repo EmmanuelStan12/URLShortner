@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+	"github.com/EmmanuelStan12/URLShortner/internal/util"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
@@ -13,7 +15,8 @@ type Config struct {
 }
 
 func InitRootConfig() (*Config, error) {
-	path := "../../app_config.yml"
+	env := os.Getenv(util.ENVIRONMENT)
+	path := fmt.Sprintf("../../app_config_%s.yml", env)
 	absPath, err := filepath.Abs(path)
 	if err != nil {
 		return nil, err

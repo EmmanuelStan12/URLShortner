@@ -1,0 +1,14 @@
+server:
+  port: 8080
+
+db:
+  host: localhost
+  username: test
+  password: test123
+  db_name: url_shortner_db_test
+  port: 3306
+
+security:
+  jwt:
+    secret_key: secret_key
+    issuer: issue

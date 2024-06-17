@@ -21,23 +21,30 @@ func (c Context) GetUserService() services.IUserService {
 	return services.UserService{DB: c.DB}
 }
 
-func InitContext() (*Context, error) {
+func InitRootContext() (*Context, error) {
 	c, err := config.InitRootConfig()
 	if err != nil {
 		return nil, err
 	}
+	ctx, err := InitContext(c)
+	if err != nil {
+		return nil, err
+	}
+	return ctx, nil
+}
 
+func InitContext(conf *config.Config) (*Context, error) {
 	s := jwt.JWTService{
-		SecretKey: c.Security.JWT.SecretKey,
-		Issuer:    c.Security.JWT.Issuer,
+		SecretKey: conf.Security.JWT.SecretKey,
+		Issuer:    conf.Security.JWT.Issuer,
 	}
 
-	db, err := database.InitDatabase(c.DB)
+	db, err := database.InitDatabase(conf.DB)
 	if err != nil {
 		return nil, err
 	}
 	context := &Context{
-		Config:     c,
+		Config:     conf,
 		DB:         db,
 		JWTService: s,
 		Routes:     util.InitRoutes(),

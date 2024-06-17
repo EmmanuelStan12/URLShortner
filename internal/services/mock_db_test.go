@@ -1,30 +1,28 @@
 package services
 
 import (
-	"database/sql"
-	"github.com/DATA-DOG/go-sqlmock"
-	"gorm.io/driver/mysql"
+	appconfig "github.com/EmmanuelStan12/URLShortner/internal/config"
+	"github.com/EmmanuelStan12/URLShortner/internal/database"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"testing"
 )
 
-func InitDBMock(t *testing.T) (*sql.DB, *gorm.DB, sqlmock.Sqlmock) {
-	sqldb, mock, err := sqlmock.New()
+func InitTestDB(t *testing.T) *gorm.DB {
+	conf, err := appconfig.InitConfig("../../app_config_dev.yml")
 	if err != nil {
-		t.Fatal(err)
+		t.Errorf("Test failed with error, %s.", err)
 	}
 
-	// Set expectation for the initial GORM version check query
-	mock.ExpectQuery("SELECT VERSION()").WillReturnRows(sqlmock.NewRows([]string{"VERSION()"}).AddRow("8.0.23"))
-
-	gormdb, err := gorm.Open(
-		mysql.New(mysql.Config{Conn: sqldb}),
-		&gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
-
+	db, err := database.InitDatabase(conf.DB)
 	if err != nil {
-		t.Fatal(err)
+		t.Errorf("Test failed with error, %s", err)
 	}
 
-	return sqldb, gormdb, mock
+	return db
+}
+
+func TeardownTestDB(db *gorm.DB) {
+	db.Exec("SET FOREIGN_KEY_CHECKS = 0")
+	db.Exec("DROP TABLE IF EXISTS users")
+	db.Exec("SET FOREIGN_KEY_CHECKS = 1")
 }

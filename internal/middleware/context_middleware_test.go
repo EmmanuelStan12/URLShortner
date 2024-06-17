@@ -9,7 +9,7 @@ import (
 )
 
 func TestContextMiddleware(t *testing.T) {
-	ctx, err := context.InitContext()
+	ctx, err := context.InitRootContext()
 	if err != nil {
 		t.Errorf("Failed to init context, %s.", err)
 	}

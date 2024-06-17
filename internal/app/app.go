@@ -10,7 +10,7 @@ import (
 )
 
 func Run() {
-	ctx, err := appcontext.InitContext()
+	ctx, err := appcontext.InitRootContext()
 
 	if err != nil {
 		panic(err)
