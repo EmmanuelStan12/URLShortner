@@ -39,7 +39,7 @@ func (u UserService) Login(request dto.LoginUserRequest) dto.UserDTO {
 		panic(result.Error)
 	}
 	if user.Email == "" {
-		panic(apperrors.NotFoundError(errors.New("email and/or password is incorrect")))
+		panic(apperrors.BadRequestError("email and/or password is incorrect"))
 	}
 	return util.ToUserDTO(user)
 }
@@ -140,7 +140,7 @@ func (u UserService) getById(userId uint) *models.User {
 	res := u.DB.First(&user, userId)
 	if res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			panic(apperrors.NotFoundError(errors.New("user not found")))
+			panic(apperrors.NotFoundError("user not found"))
 		}
 		panic(res.Error)
 	}

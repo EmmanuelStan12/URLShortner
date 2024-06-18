@@ -18,7 +18,7 @@ func TestErrorMiddleware(t *testing.T) {
 		{
 			name: "App errors",
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				panic(apperrors.UnauthorizedError(errors.New("testing app errors")))
+				panic(apperrors.UnauthorizedError("testing app errors"))
 			},
 			expectedStatus: http.StatusUnauthorized,
 		},

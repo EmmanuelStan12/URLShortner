@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"errors"
 	"github.com/EmmanuelStan12/URLShortner/internal/constants"
 	"github.com/EmmanuelStan12/URLShortner/internal/services"
 	"github.com/EmmanuelStan12/URLShortner/internal/util"
@@ -23,12 +22,12 @@ func JWTMiddleware(service jwt.JWTService, routes util.Routes, userService servi
 
 			token := r.Header.Get("Authorization")
 			if token == "" {
-				panic(apperrors.UnauthorizedError(errors.New("invalid token")))
+				panic(apperrors.UnauthorizedError("invalid token"))
 			}
 			token = token[len("Bearer "):]
 			userId, err := service.ParseToken(token)
 			if err != nil {
-				panic(apperrors.UnauthorizedError(errors.New("invalid token")))
+				panic(apperrors.UnauthorizedError("invalid token"))
 			}
 			user := userService.GetById(userId)
 			routeCtx := context.WithValue(r.Context(), constants.UserKey, user)

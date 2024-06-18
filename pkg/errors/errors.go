@@ -12,19 +12,19 @@ func newError(code int, err any) *Error {
 	}
 }
 
-func NotFoundError(err error) *Error {
+func NotFoundError(err any) *Error {
 	return newError(404, err)
 }
 
-func InternalServerError(err error) *Error {
+func InternalServerError(err any) *Error {
 	return newError(500, err)
 }
 
-func BadRequestError(err error) *Error {
+func BadRequestError(err any) *Error {
 	return newError(400, err)
 }
 
-func UnauthorizedError(err error) *Error {
+func UnauthorizedError(err any) *Error {
 	return newError(401, err)
 }
 

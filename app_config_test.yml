@@ -1,5 +1,6 @@
 server:
   port: 3340
+  hostname: http://localhost:3340
 
 db:
   host: localhost

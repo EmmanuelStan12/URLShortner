@@ -1,11 +1,15 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type Url struct {
 	gorm.Model
 	OriginalURL string
-	ShortURL    string
+	ShortUrlId  string
+	ExpiryDate  time.Time
 	UserID      uint
 	User        User
 }

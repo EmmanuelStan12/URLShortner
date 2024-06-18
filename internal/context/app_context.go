@@ -21,6 +21,10 @@ func (c Context) GetUserService() services.IUserService {
 	return services.UserService{DB: c.DB}
 }
 
+func (c Context) GetUrlService() services.IUrlService {
+	return services.UrlService{DB: c.DB}
+}
+
 func InitRootContext() (*Context, error) {
 	c, err := config.InitRootConfig()
 	if err != nil {

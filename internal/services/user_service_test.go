@@ -10,45 +10,21 @@ import (
 	"testing"
 )
 
-func handlePanic[T any](t *testing.T, fn func()) {
-	defer func() {
-		if r := recover(); r != nil {
-			_, ok := r.(T)
-			if !ok {
-				t.Errorf("expected an error, got %v", r)
-			}
-			t.Logf("error: %v", r)
-		} else {
-			t.Error("expected panic but did not panic")
-		}
-	}()
-
-	fn()
-}
-
-func InitMigrations(db *gorm.DB) {
-	err := db.AutoMigrate(&models.User{})
-	if err != nil {
-		return
-	}
-}
-
-func InitTestUser(db *gorm.DB) *models.User {
-	InitMigrations(db)
+func initTestUser(db *gorm.DB) *models.User {
 	password, _ := util.HashPassword("Test.password.1")
 	user := models.User{
 		Name:     "test.name.1",
 		Email:    "test1@email.com",
 		Password: password,
 	}
-	db.Create(&user)
+	db.Save(&user)
 	return &user
 }
 
 func TestUserService_Login(t *testing.T) {
-	db := InitTestDB(t)
-	InitTestUser(db)
-	defer TeardownTestDB(db)
+	db, _ := initTestDB(t)
+	initTestUser(db)
+	defer teardownTestDB(db)
 	userService := UserService{DB: db}
 
 	t.Run("Panic on empty password", func(t *testing.T) {
@@ -74,9 +50,8 @@ func TestUserService_Login(t *testing.T) {
 }
 
 func TestUserService_GetById(t *testing.T) {
-	db := InitTestDB(t)
-	InitMigrations(db)
-	defer TeardownTestDB(db)
+	db, _ := initTestDB(t)
+	defer teardownTestDB(db)
 	userService := UserService{DB: db}
 
 	t.Run("get existing user", func(t *testing.T) {
@@ -85,7 +60,7 @@ func TestUserService_GetById(t *testing.T) {
 			Email:    fmt.Sprintf("test%d@email.com", 1),
 			Password: "test.password",
 		}
-		db.Create(&user)
+		db.Save(&user)
 
 		result := userService.GetById(user.ID)
 
@@ -96,9 +71,9 @@ func TestUserService_GetById(t *testing.T) {
 }
 
 func TestUserService_Create(t *testing.T) {
-	db := InitTestDB(t)
-	InitTestUser(db)
-	defer TeardownTestDB(db)
+	db, _ := initTestDB(t)
+	initTestUser(db)
+	defer teardownTestDB(db)
 	userService := UserService{DB: db}
 
 	t.Run("test create user panic tests", func(t *testing.T) {
@@ -109,7 +84,6 @@ func TestUserService_Create(t *testing.T) {
 		}{
 			{
 				request: dto.RegisterUserRequest{
-					Name:     "",
 					Email:    "test4@email.com",
 					Password: "Test.password.123!",
 				},
@@ -118,7 +92,6 @@ func TestUserService_Create(t *testing.T) {
 			{
 				request: dto.RegisterUserRequest{
 					Name:     "test.name",
-					Email:    "",
 					Password: "Test.password.123!",
 				},
 				name: "create user without email",
@@ -141,9 +114,8 @@ func TestUserService_Create(t *testing.T) {
 			},
 			{
 				request: dto.RegisterUserRequest{
-					Name:     "test.name",
-					Email:    "test1@email.com",
-					Password: "",
+					Name:  "test.name",
+					Email: "test1@email.com",
 				},
 				name: "create user with empty password",
 			},
@@ -178,9 +150,9 @@ func TestUserService_Create(t *testing.T) {
 }
 
 func TestUserService_Update(t *testing.T) {
-	db := InitTestDB(t)
-	user := InitTestUser(db)
-	defer TeardownTestDB(db)
+	db, _ := initTestDB(t)
+	user := initTestUser(db)
+	defer teardownTestDB(db)
 	userService := UserService{DB: db}
 
 	t.Run("test create user panic tests", func(t *testing.T) {
@@ -247,9 +219,9 @@ func TestUserService_Update(t *testing.T) {
 }
 
 func TestUserService_Delete(t *testing.T) {
-	db := InitTestDB(t)
-	user := InitTestUser(db)
-	defer TeardownTestDB(db)
+	db, _ := initTestDB(t)
+	user := initTestUser(db)
+	defer teardownTestDB(db)
 	userService := UserService{DB: db}
 
 	t.Run("delete non-existent user", func(t *testing.T) {

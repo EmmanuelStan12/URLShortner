@@ -1,11 +1,11 @@
 package dto
 
 type ErrorResponse struct {
-	Status  int    `status:"json"`
-	Message string `message:"json"`
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }
 
 type SuccessResponse[T any] struct {
-	Status int `status:"json"`
-	Data   T   `data:"json"`
+	Status int `json:"status"`
+	Data   T   `json:"data"`
 }

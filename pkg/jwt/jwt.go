@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	builtInErrors "errors"
 	"fmt"
 	"github.com/EmmanuelStan12/URLShortner/pkg/errors"
 	"github.com/golang-jwt/jwt/v5"
@@ -70,7 +69,7 @@ func (s *JWTService) ParseToken(tokenStr string) (uint, *errors.Error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if !ok {
-		return 0, errors.InternalServerError(builtInErrors.New("can't pass claims"))
+		return 0, errors.InternalServerError("can't pass claims")
 	}
 	userId, e := getUserId(claims)
 	if err != nil {
