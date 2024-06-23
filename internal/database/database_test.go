@@ -6,7 +6,7 @@ import (
 )
 
 func TestInitDatabase(t *testing.T) {
-	conf, err := config.InitConfig("../../app_config_test.yml")
+	conf, err := config.InitConfig("../../app_config.yml")
 	if err != nil {
 		t.Errorf("Failed to load yml config, %s.", err.Error())
 	}

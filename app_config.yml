@@ -1,0 +1,16 @@
+server:
+  port: ${PORT}
+  hostname: ${HOSTNAME}
+  profile: ${PROFILE}
+
+db:
+  host: ${DB_HOST}
+  username: ${DB_USERNAME}
+  password: ${DB_PASSWORD}
+  db_name: ${DB_NAME}
+  port: ${DB_PORT}
+
+security:
+  jwt:
+    secret_key: ${JWT_SECRET_KEY}
+    issuer: ${JWT_ISSUER}

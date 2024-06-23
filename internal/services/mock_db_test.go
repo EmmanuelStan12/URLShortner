@@ -9,7 +9,7 @@ import (
 )
 
 func initTestDB(t *testing.T) (*gorm.DB, appconfig.Config) {
-	conf, err := appconfig.InitConfig("../../app_config_dev.yml")
+	conf, err := appconfig.InitConfig("../../app_config.yml")
 	if err != nil {
 		t.Errorf("Test failed with error, %s.", err)
 	}

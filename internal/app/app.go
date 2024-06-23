@@ -49,7 +49,7 @@ func Run() {
 		r.Get("/{short_link_id}", handlers.VisitShortenedUrl)
 	})
 
-	fmt.Printf("Running server on hostname: %s, and port %s\n", ctx.Config.Server.Hostname, ctx.Config.Server.Port)
+	fmt.Printf("Running server on hostname/ip address: %s, and port %s\n", ctx.Config.Server.Hostname, ctx.Config.Server.Port)
 
 	log.Fatal(http.ListenAndServe(":"+ctx.Config.Server.Port, r))
 }

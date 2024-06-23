@@ -22,7 +22,6 @@ type UserService struct {
 }
 
 func (u UserService) Login(request dto.LoginUserRequest) dto.UserDTO {
-	var user models.User
 	errs := make([]string, 0)
 	if request.Password == "" {
 		errs = append(errs, "password cannot be empty")
@@ -33,12 +32,12 @@ func (u UserService) Login(request dto.LoginUserRequest) dto.UserDTO {
 	if len(errs) > 0 {
 		panic(apperrors.ValidationError(errs))
 	}
-	password, _ := util.HashPassword(request.Password)
-	result := u.DB.Where("email = ? AND password = ?", request.Email, password).Find(&user)
+	var user models.User
+	result := u.DB.Where("email = ?", request.Email).First(&user)
 	if result.Error != nil {
 		panic(result.Error)
 	}
-	if user.Email == "" {
+	if user.ID == 0 || !util.ComparePasswordHash(request.Password, user.Password) {
 		panic(apperrors.BadRequestError("email and/or password is incorrect"))
 	}
 	return util.ToUserDTO(user)

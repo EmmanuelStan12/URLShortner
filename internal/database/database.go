@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"github.com/EmmanuelStan12/URLShortner/internal/config"
 	"github.com/EmmanuelStan12/URLShortner/internal/models"
 	"gorm.io/driver/mysql"
@@ -8,14 +9,16 @@ import (
 )
 
 func InitDatabase(dbConfig config.DBConfig) (*gorm.DB, error) {
+	dsn := dbConfig.ConstructDSN()
 	db, err := gorm.Open(
 		mysql.New(
 			mysql.Config{
-				DSN: dbConfig.ConstructDSN(),
+				DSN: dsn,
 			},
 		),
 		&gorm.Config{},
 	)
+	fmt.Printf("Logging into db with dsn: %s\n", dsn)
 
 	if err != nil {
 		return nil, err

@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    container_name: url_shortener
+    environment:
+      PROFILE: ${PROFILE}
+      PORT: ${PORT}
+      HOSTNAME: ${HOSTNAME}
+      DB_PORT: ${DB_PORT}
+      DB_HOST: url_db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ISSUER: ${JWT_ISSUER}
+    ports:
+      - "3340:3340"
+    depends_on:
+      - url_db
+    links:
+      - "url_db:database"
+    networks:
+      - default
+
+
+  url_db:
+    image: mysql
+    container_name: url_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - default
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5

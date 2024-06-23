@@ -6,7 +6,7 @@ import (
 
 func TestInitConfig(t *testing.T) {
 	t.Run("Valid file", func(t *testing.T) {
-		config, err := InitConfig("../../app_config_test.yml")
+		config, err := InitConfig("../../app_config.yml")
 		if err != nil {
 			t.Errorf("Test failed with error, %s.", err)
 		}

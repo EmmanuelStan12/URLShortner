@@ -1,11 +1,11 @@
 package config
 
 import (
-	"fmt"
-	"github.com/EmmanuelStan12/URLShortner/internal/util"
 	"gopkg.in/yaml.v3"
+	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 type Config struct {
@@ -15,9 +15,7 @@ type Config struct {
 }
 
 func InitRootConfig() (*Config, error) {
-	env := os.Getenv(util.ENVIRONMENT)
-	path := fmt.Sprintf("app_config_%s.yml", env)
-	absPath, err := filepath.Abs(path)
+	absPath, err := filepath.Abs("app_config.yml")
 	if err != nil {
 		return nil, err
 	}
@@ -29,9 +27,22 @@ func InitRootConfig() (*Config, error) {
 }
 
 func InitConfig(path string) (*Config, error) {
-	file, err := os.Open(path)
+	data, err := loadConfigPreprocessor(path)
 	if err != nil {
 		return nil, err
+	}
+
+	config := &Config{}
+	if err := yaml.Unmarshal([]byte(data), &config); err != nil {
+		return nil, err
+	}
+	return config, nil
+}
+
+func loadConfigPreprocessor(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
 	}
 	defer func(file *os.File) {
 		err := file.Close()
@@ -39,12 +50,18 @@ func InitConfig(path string) (*Config, error) {
 			panic(err)
 		}
 	}(file)
-
-	decoder := yaml.NewDecoder(file)
-
-	config := &Config{}
-	if err := decoder.Decode(config); err != nil {
-		return nil, err
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return "", err
 	}
-	return config, nil
+
+	content := string(data)
+	envExp := regexp.MustCompile(`\$\{(\w+)\}`)
+
+	processedContent := envExp.ReplaceAllStringFunc(content, func(match string) string {
+		envVar := envExp.FindStringSubmatch(match)[1]
+		return os.Getenv(envVar)
+	})
+
+	return processedContent, nil
 }
